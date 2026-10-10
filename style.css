@@ -1,0 +1,40 @@
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0; background: #0d1117; color: #e6edf3;
+  font-family: "Pretendard", -apple-system, "Noto Sans KR", sans-serif;
+  user-select: none; min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+}
+.hud {
+  width: 100%; max-width: 430px; display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 20px; background: #161b22; border-bottom: 1px solid #2d3748;
+}
+.label { font-size: 11px; color: #8b949e; }
+.val { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.mini-btn { background: #1c2330; border: 1px solid #2d3748; color: #e6edf3; border-radius: 10px; font-size: 18px; padding: 8px 14px; cursor: pointer; }
+main { width: 100%; max-width: 430px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.grid {
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px;
+  background: #11161d; border: 1px solid #2d3748; border-radius: 14px; padding: 10px;
+}
+.cell { aspect-ratio: 1; border-radius: 6px; background: #1a2230; transition: background 0.1s; }
+.cell.ghost { background: #2f81f755 !important; outline: 2px dashed #2f81f7; }
+.cell.clearing { animation: pop 0.3s; }
+@keyframes pop { 50% { transform: scale(1.25); filter: brightness(1.8); } }
+.hint { text-align: center; color: #8b949e; font-size: 12px; margin: 2px 0; }
+.tray { display: flex; gap: 10px; justify-content: center; }
+.piece {
+  background: #161b22; border: 1px solid #2d3748; border-radius: 12px; padding: 10px; cursor: pointer;
+  display: grid; gap: 3px;
+}
+.piece.selected { border-color: #2f81f7; box-shadow: 0 0 0 2px #2f81f755; }
+.piece.used { opacity: 0.25; pointer-events: none; }
+.pcell { width: 22px; height: 22px; border-radius: 5px; }
+.pcell.empty { background: transparent; }
+.overlay { position: fixed; inset: 0; background: rgba(5,8,14,0.88); display: flex; align-items: center; justify-content: center; z-index: 20; }
+.overlay.hidden { display: none; }
+.overlay-box { text-align: center; background: #161b22; border: 1px solid #2d3748; border-radius: 20px; padding: 36px 44px; }
+.overlay-box h1 { margin: 0 0 10px; }
+.overlay-box .big { font-size: 52px; font-weight: 900; color: #ffb020; margin: 6px 0 16px; }
+#newBest { color: #3fb950; font-weight: 700; }
+#newBest.hidden { display: none; }
+.btn { background: #2f81f7; color: #fff; border: none; border-radius: 12px; padding: 14px 40px; font-size: 17px; font-weight: 800; cursor: pointer; }

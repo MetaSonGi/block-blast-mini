@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>블록 블라스트 미니</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="hud">
+  <div><span class="label">점수</span><div id="score" class="val">0</div></div>
+  <div><span class="label">최고</span><div id="best" class="val">0</div></div>
+  <button id="resetBtn" class="mini-btn">↺</button>
+</header>
+<main>
+  <div id="grid" class="grid"></div>
+  <p class="hint">블록을 터치 → 보드에 터치해서 놓기</p>
+  <div id="tray" class="tray"></div>
+</main>
+<div id="overlay" class="overlay hidden">
+  <div class="overlay-box">
+    <h1>🧱 게임 오버</h1>
+    <div class="big" id="finalScore">0</div>
+    <p id="newBest" class="hidden">🎉 최고 기록 경신!</p>
+    <button id="againBtn" class="btn">↺ 다시 하기</button>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
