@@ -102,8 +102,10 @@
   /**
    * 관대한 놓기 판정: 탭/드롭한 칸을 기준으로 놓을 수 있는
    * 가장 가까운 앵커를 찾는다 (탭 위치 → 도형 중심 → 주변 2칸).
+   * farOk가 true면(탭 방식) 보드 전체에서 가장 가까운 유효 앵커까지 탐색:
+   * 둘 곳이 있으면 반드시 놓이고, 정말 없으면 null → 게임 오버 판정.
    */
-  function findAnchor(shape, r, c) {
+  function findAnchor(shape, r, c, farOk) {
     const { rows, cols } = shapeSize(shape);
     const cand = [[r, c], [r - (rows >> 1), c - (cols >> 1)]];
     for (let d = 1; d <= 2; d++) {
@@ -121,16 +123,23 @@
       seen.add(k);
       if (canPlace(shape, rr, cc)) return { r: rr, c: cc };
     }
-    return null;
+    if (!farOk) return null;
+    let bestA = null, bestD = Infinity;
+    for (let rr = 0; rr < N; rr++) for (let cc = 0; cc < N; cc++) {
+      if (!canPlace(shape, rr, cc)) continue;
+      const dd = Math.abs(rr - r) + Math.abs(cc - c);
+      if (dd < bestD) { bestD = dd; bestA = { r: rr, c: cc }; }
+    }
+    return bestA;
   }
 
-  /** 고스트 미리보기 (관대한 앵커 기준) */
+  /** 고스트 미리보기 (관대한 앵커 기준, 드래그는 근처만) */
   function previewAt(r, c) {
     clearGhost();
     if (selected == null) return;
     const p = tray[selected];
     if (!p || p.used) return;
-    const a = findAnchor(p.shape, r, c);
+    const a = findAnchor(p.shape, r, c, false);
     if (!a) return;
     p.shape.forEach(([x, y]) => cellEls[a.r + y][a.c + x].classList.add('ghost'));
   }
@@ -225,7 +234,7 @@
     const cell = cellFromPoint(e.clientX, e.clientY);
     if (cell) {
       const p = tray[st.idx];
-      const a = findAnchor(p.shape, cell.r, cell.c);
+      const a = findAnchor(p.shape, cell.r, cell.c, false);
       if (a) {
         p.shape.forEach(([x, y]) => cellEls[a.r + y][a.c + x].classList.add('ghost'));
         st.anchor = a;
@@ -265,9 +274,10 @@
     if (selected == null) return;
     const p = tray[selected];
     if (!p || p.used) return;
-    const a = findAnchor(p.shape, r, c);
+    const a = findAnchor(p.shape, r, c, true);
     if (!a) {
-      // 놓을 수 없으면 빨간 플래시로 피드백
+      // 둘 곳이 정말 하나도 없으면 게임 오버 (안전망)
+      if (!anyMovePossible()) { gameOver(); return; }
       cellEls[r][c].classList.add('invalid');
       setTimeout(() => cellEls[r][c].classList.remove('invalid'), 260);
       return;
@@ -284,6 +294,12 @@
     selected = null;
     const cleared = clearLines();
     refreshGrid();
+    if (!cleared.length) {
+      // 방금 놓은 셀 강조 (멀리 자동 배치됐을 때 눈에 띄게)
+      const cells = p.shape.map(([x, y]) => [r + y, c + x]);
+      cells.forEach(([rr, cc]) => cellEls[rr][cc].classList.add('landed'));
+      setTimeout(() => cells.forEach(([rr, cc]) => cellEls[rr][cc].classList.remove('landed')), 320);
+    }
     updateTray();
     $('score').textContent = score;
     const finish = () => {
@@ -374,10 +390,11 @@
 
   // 로직 단위 테스트용 노출
   window.__bbm = {
-    applyGravity, findAnchor, canPlace, clearLines,
+    applyGravity, findAnchor, canPlace, clearLines, anyMovePossible, refreshGrid,
     get grid() { return grid; },
     set grid(v) { grid = v; },
     get score() { return score; },
+    get tray() { return tray; },
     newGrid() { grid = Array.from({ length: N }, () => Array(N).fill(null)); },
   };
 })();
